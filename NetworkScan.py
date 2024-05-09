@@ -11,6 +11,12 @@ def Netscanner(scanip, IPIS, lock):
             print(scanip)
             IPIS.append(scanip)
 
+def GetDeviceName(deviceIP):
+    try:
+        device_name = socket.gethostbyaddr(deviceIP)
+        print(device_name)
+    except Exception as e:
+        pass
 
 def get_ip():
     iplist = []
@@ -20,21 +26,23 @@ def get_ip():
             start = line.find(":")
             result = line[start + 2:-1]
             iplist.append(result)
-    return iplist[1]
-
-def GetDeviceName(deviceIP):
-    try:
-        device_name = socket.gethostbyaddr(deviceIP)
-        print(device_name)
-    except Exception as e:
-        pass
+    return iplist
 
 
 def Run():
     lock = threading.Lock()
-    myip = get_ip()
+    iplist = get_ip()
+    
+    if not iplist:
+        print("No IPv4 addresses found.")
+        return
+    
+    myip = iplist[0]  # Use the first IP address from the list
     print("My IP is:", myip)
+    
+    # If you want to cut off the last octet from the IP address:
     myip = myip[:myip.rfind(".") + 1]
+    
     lock = threading.Lock()
 
     IPIS = []
@@ -60,8 +68,6 @@ def Run():
 
     for thread in threads:
         thread.join()
-
-
 
 if __name__ == "__main__":
     Run()
